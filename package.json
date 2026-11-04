@@ -1,0 +1,36 @@
+{
+  "name": "ripple-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RippleGuard: Jira-first Atlassian Forge app that flags when Jira changes put documented customer commitments at risk.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "postinstall": "npm --prefix static/rippleguard-ui install",
+    "dev": "npm --prefix static/rippleguard-ui run dev",
+    "tunnel": "forge tunnel",
+    "build": "npm --prefix static/rippleguard-ui run build",
+    "typecheck": "tsc --noEmit && npm --prefix static/rippleguard-ui run typecheck",
+    "lint": "oxlint src && npm --prefix static/rippleguard-ui run lint && forge lint",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "deploy": "npm run build && forge deploy",
+    "deploy:install": "npm run deploy && forge install --upgrade",
+    "logs": "forge logs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@forge/api": "^8.4.0",
+    "@forge/kvs": "^2.1.1",
+    "@forge/llm": "^1.0.9",
+    "@forge/resolver": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "oxlint": "^1.91.0",
+    "typescript": "~5.9.2",
+    "vitest": "^5.1.0"
+  }
+}

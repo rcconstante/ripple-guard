@@ -1,0 +1,51 @@
+# RippleGuard: Forge manifest (foundation).
+#
+# Only these module types may be added (docs/ARCHITECTURE.md §B):
+#   jira:globalPage, jira:issuePanel, trigger, function, llm, action,
+#   rovo:agent, rovo:skill, rovo:mcp
+# Add trigger / llm / action / rovo:* in the feature phase that needs them,
+# after checking the current official docs. Every module or scope change needs
+# a fresh `forge deploy` and usually `forge install --upgrade`.
+
+modules:
+  jira:globalPage:
+    # F01, F02, F05: the four app views (Impact Dashboard, Commitments,
+    # Commitment Detail, Impact Explorer), routed client-side.
+    - key: rippleguard-global-page
+      resource: ui
+      resolver:
+        function: resolver
+      title: RippleGuard
+
+  jira:issuePanel:
+    # F03: linked commitment summaries for the open Jira issue.
+    - key: rippleguard-issue-panel
+      resource: ui
+      resolver:
+        function: resolver
+      title: RippleGuard
+      icon: resource:ui;panel-icon.svg # required by jira:issuePanel
+
+  function:
+    - key: resolver
+      handler: index.handler
+
+resources:
+  - key: ui
+    path: static/rippleguard-ui/build
+    tunnel:
+      port: 5173 # must match server.port in static/rippleguard-ui/vite.config.ts
+
+permissions:
+  scopes:
+    - storage:app # F02: Forge KVS commitment records
+    - read:jira-work # F02/F03: read and validate linked Jira issues
+  content:
+    styles:
+      # Radix/shadcn primitives and the shadcn chart component inject <style> elements.
+      - unsafe-inline
+
+app:
+  id: ari:cloud:ecosystem::app/ad4d4803-cf2d-444f-a50a-7fa8fba7c4fa
+  runtime:
+    name: nodejs24.x
