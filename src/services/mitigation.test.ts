@@ -6,6 +6,7 @@ vi.mock('./store', () => ({
   getMitigation: vi.fn(),
   claimMitigationAttempt: vi.fn(),
   putMitigation: vi.fn(),
+  MAX_MITIGATION_ATTEMPTS: 25,
 }));
 vi.mock('./jira', () => ({
   fetchIssueFacts: vi.fn(),

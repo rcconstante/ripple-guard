@@ -7,7 +7,7 @@ import type { Caller } from './context';
 import { createIssueAsUser, fetchIssueFacts, findTaskIssueType, isPlatformAuthError } from './jira';
 import { fail, MESSAGES, ok } from './result';
 import { refreshRisk } from './risk';
-import { claimMitigationAttempt, getCommitment, getMitigation, putMitigation } from './store';
+import { claimMitigationAttempt, getCommitment, getMitigation, MAX_MITIGATION_ATTEMPTS, putMitigation } from './store';
 import { toMitigationView } from './views';
 
 /**
@@ -15,9 +15,10 @@ import { toMitigationView } from './views';
  * as the owner. Previewing has no side effects.
  *
  * Duplicate safety:
- * - Every create attempt first claims an attempt number atomically in KVS
- *   (store.claimMitigationAttempt), so repeat clicks and concurrent retries
- *   can't both call Jira.
+ * - Every create attempt first claims the next attempt number with ONE
+ *   conditional KVS write (store.claimMitigationAttempt), so repeat clicks and
+ *   concurrent retries can't both call Jira, and a KVS failure can't leave a
+ *   half-claimed state that blocks later retries.
  * - The slot is released (state `failed`) only when Jira definitively rejected
  *   the request (4xx). If the outcome is unknown (network error, timeout, 5xx)
  *   the record stays `pending`: Jira may have created the issue, so RippleGuard
@@ -100,6 +101,19 @@ async function prepare(caller: Caller, commitmentId: string, siteBaseUrl: string
   return ok({ commitment, snapshot, draft, existing });
 }
 
+/**
+ * Mark an attempt as definitively failed so the owner can try again. If this
+ * write fails, the attempt simply stays `pending`: safe (no duplicate), and the
+ * owner's review path can still claim the next attempt number.
+ */
+async function releaseAttempt(pending: MitigationReference): Promise<void> {
+  try {
+    await putMitigation({ ...pending, state: 'failed' });
+  } catch {
+    // stays pending
+  }
+}
+
 /** Read-only draft for the review modal. Never creates anything (F06-T02). */
 export async function previewMitigation(caller: Caller, commitmentId: string, siteBaseUrl: string): Promise<Result<MitigationDraft>> {
   const ready = await prepare(caller, commitmentId, siteBaseUrl);
@@ -144,6 +158,10 @@ export async function createMitigation(
     riskFingerprint: snapshot.signature,
   };
 
+  if (pending.attempt > MAX_MITIGATION_ATTEMPTS) {
+    return fail('INVALID_STATE', 'Too many attempts to create this mitigation issue. Create it in Jira directly.');
+  }
+
   if (!(await claimMitigationAttempt(pending))) {
     const latest = await getMitigation(commitment.id, commitment.installationId);
     return latest?.state === 'created'
@@ -161,13 +179,13 @@ export async function createMitigation(
     });
   } catch (error) {
     // The user still has to grant access: no request reached Jira.
-    if (isPlatformAuthError(error)) await putMitigation({ ...pending, state: 'failed' });
+    if (isPlatformAuthError(error)) await releaseAttempt(pending);
     throw error;
   }
 
   if (outcome.kind === 'rejected') {
     // Jira refused the request, so nothing exists: allow a new attempt.
-    await putMitigation({ ...pending, state: 'failed' });
+    await releaseAttempt(pending);
     return fail('JIRA_CREATE_FAILED', `No issue was created. ${outcome.message}`);
   }
 

@@ -8,8 +8,7 @@ import type { Commitment, MitigationReference, RiskSnapshot } from '../domain/mo
  *
  *   commitment:<id>                          Commitment
  *   risk:<commitmentId>                      RiskSnapshot
- *   mitigation:<commitmentId>                MitigationReference
- *   mitigation-attempt:<commitmentId>:<n>    retry claim marker (atomic, F06)
+ *   mitigation:<commitmentId>:<attempt>      MitigationReference, one key per attempt (F06)
  *   issue-index:<jiraIssueId>:<commitmentId> { commitmentId }
  *
  * The issue index uses one key per (issue, commitment) pair instead of one
@@ -22,8 +21,7 @@ const PAGE_SIZE = 100;
 export const keys = {
   commitment: (id: string) => `commitment:${id}`,
   risk: (commitmentId: string) => `risk:${commitmentId}`,
-  mitigation: (commitmentId: string) => `mitigation:${commitmentId}`,
-  mitigationAttempt: (commitmentId: string, attempt: number) => `mitigation-attempt:${commitmentId}:${attempt}`,
+  mitigation: (commitmentId: string, attempt: number) => `mitigation:${commitmentId}:${attempt}`,
   issueIndex: (issueId: string, commitmentId: string) => `issue-index:${issueId}:${commitmentId}`,
   issueIndexPrefix: (issueId: string) => `issue-index:${issueId}:`,
 };
@@ -101,14 +99,36 @@ export async function putRiskSnapshot(snapshot: RiskSnapshot): Promise<void> {
 // Mitigation references (F06)
 // ---------------------------------------------------------------------------
 
+/**
+ * Mitigation attempts are stored one key per attempt: `mitigation:<commitmentId>:<n>`.
+ * Claiming attempt n is a single conditional write (FAIL_IF_EXISTS) of the full
+ * pending reference, so there is no second write that could fail and leave a
+ * half-claimed state. Attempt n+1 is only ever claimed after attempt n was
+ * read, so attempts are contiguous from 1 and the latest is found by reading
+ * 1, 2, 3, ... until the first missing key (strongly consistent `get`s).
+ */
+export const MAX_MITIGATION_ATTEMPTS = 25;
+
+/** The latest mitigation attempt for a commitment, or null if none was ever made. */
 export async function getMitigation(commitmentId: string, installationId: string): Promise<MitigationReference | null> {
-  const ref = await kvs.get<MitigationReference>(keys.mitigation(commitmentId));
-  return ref && ref.installationId === installationId ? ref : null;
+  let latest: MitigationReference | null = null;
+  for (let attempt = 1; attempt <= MAX_MITIGATION_ATTEMPTS; attempt += 1) {
+    const ref = await kvs.get<MitigationReference>(keys.mitigation(commitmentId, attempt));
+    if (ref === undefined) break;
+    latest = ref;
+  }
+  return latest && latest.installationId === installationId ? latest : null;
 }
 
-async function setIfAbsent(key: string, value: unknown): Promise<boolean> {
+/**
+ * Atomically claim attempt `pending.attempt` by creating its key.
+ * Returns false when another request already claimed that attempt
+ * (duplicate click, concurrent retry). Throws if KVS fails; nothing is half-written.
+ */
+export async function claimMitigationAttempt(pending: MitigationReference): Promise<boolean> {
+  const key = keys.mitigation(pending.commitmentId, pending.attempt);
   try {
-    await kvs.set(key, value, { keyPolicy: 'FAIL_IF_EXISTS' });
+    await kvs.set(key, pending, { keyPolicy: 'FAIL_IF_EXISTS' });
     return true;
   } catch (error) {
     // The KVS docs don't name the "key exists" error; confirm by reading the key.
@@ -117,25 +137,7 @@ async function setIfAbsent(key: string, value: unknown): Promise<boolean> {
   }
 }
 
-/**
- * Atomically claim the right to make a mitigation create attempt.
- * - Attempt 1 claims `mitigation:<commitmentId>` itself (absent until the first attempt).
- * - Attempt N > 1 claims `mitigation-attempt:<commitmentId>:<N>`, so two concurrent
- *   retries of the same previous attempt can't both proceed; the winner then
- *   records the new pending attempt on `mitigation:<commitmentId>`.
- * Returns false when another request already holds this attempt.
- */
-export async function claimMitigationAttempt(pending: MitigationReference): Promise<boolean> {
-  if (pending.attempt === 1) return setIfAbsent(keys.mitigation(pending.commitmentId), pending);
-  const claimed = await setIfAbsent(keys.mitigationAttempt(pending.commitmentId, pending.attempt), {
-    commitmentId: pending.commitmentId,
-    attempt: pending.attempt,
-    claimedAt: pending.createdAt,
-  });
-  if (claimed) await kvs.set(keys.mitigation(pending.commitmentId), pending);
-  return claimed;
-}
-
+/** Record the outcome of an attempt this request claimed (created / failed). */
 export async function putMitigation(ref: MitigationReference): Promise<void> {
-  await kvs.set(keys.mitigation(ref.commitmentId), ref);
+  await kvs.set(keys.mitigation(ref.commitmentId, ref.attempt), ref);
 }
