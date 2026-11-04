@@ -1,0 +1,33 @@
+{
+  "project": "RippleGuard",
+  "event": "Codegeist 2026",
+  "release": "v1.0",
+  "frozen": true,
+  "authority": "docs/FEATURE_SCOPE.md",
+  "allowedFeatureIds": ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08"],
+  "features": {
+    "F01": "Impact Dashboard",
+    "F02": "Commitment Register",
+    "F03": "Jira Integration",
+    "F04": "Deterministic Risk Engine",
+    "F05": "Evidence & Impact Graph",
+    "F06": "Mitigation workflow",
+    "F07": "Rovo Agent",
+    "F08": "MCP exposure"
+  },
+  "allowedModuleTypes": [
+    "jira:globalPage",
+    "jira:issuePanel",
+    "trigger",
+    "function",
+    "llm",
+    "action",
+    "rovo:agent",
+    "rovo:skill",
+    "rovo:mcp"
+  ],
+  "globalPageViews": ["Impact Dashboard", "Commitments", "Commitment Detail", "Impact Explorer"],
+  "readOnlyActions": ["list-at-risk-commitments", "get-commitment-evidence", "preview-issue-impact"],
+  "triggerEvents": ["avi:jira:updated:issue"],
+  "changeProcedure": "Only the project owner can change scope: amend docs/FEATURE_SCOPE.md and this file, and the relevant tests, before any implementation change (AGENTS.md)."
+}

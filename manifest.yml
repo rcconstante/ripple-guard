@@ -1,15 +1,13 @@
-# RippleGuard: Forge manifest (foundation).
+# RippleGuard: Forge manifest.
 #
-# Only these module types may be added (docs/ARCHITECTURE.md §B):
+# Only these module types are allowed (docs/ARCHITECTURE.md §B):
 #   jira:globalPage, jira:issuePanel, trigger, function, llm, action,
 #   rovo:agent, rovo:skill, rovo:mcp
-# Add trigger / llm / action / rovo:* in the feature phase that needs them,
-# after checking the current official docs. Every module or scope change needs
-# a fresh `forge deploy` and usually `forge install --upgrade`.
+# Every module or scope change needs `forge deploy` and `forge install --upgrade`.
 
 modules:
   jira:globalPage:
-    # F01, F02, F05: the four app views (Impact Dashboard, Commitments,
+    # F01, F02, F05: four app views (Impact Dashboard, Commitments,
     # Commitment Detail, Impact Explorer), routed client-side.
     - key: rippleguard-global-page
       resource: ui
@@ -18,7 +16,7 @@ modules:
       title: RippleGuard
 
   jira:issuePanel:
-    # F03: linked commitment summaries for the open Jira issue.
+    # F03: linked commitment summaries for the open Jira issue (read-only).
     - key: rippleguard-issue-panel
       resource: ui
       resolver:
@@ -26,23 +24,127 @@ modules:
       title: RippleGuard
       icon: resource:ui;panel-icon.svg # required by jira:issuePanel
 
+  trigger:
+    # F03: the single event subscription. Re-evaluates risk; never mutates Jira.
+    - key: rippleguard-issue-updated
+      function: issue-updated
+      events:
+        - avi:jira:updated:issue
+      filter:
+        ignoreSelf: true
+
+  llm:
+    # F04: grounded wording for risk explanations only (never classification).
+    - key: rippleguard-llm
+      model:
+        - claude
+
+  action:
+    # F07/F08: exactly three read-only actions (actionVerb GET).
+    - key: list-at-risk-commitments
+      name: List at-risk commitments
+      function: fn-list-at-risk
+      actionVerb: GET
+      description: |
+        Lists the customer delivery commitments the user can access that RippleGuard currently rates At risk or Overdue, with reason codes, linked Jira issues, dates and source links. Read-only.
+      inputs:
+        status:
+          title: Status filter
+          type: string
+          required: false
+          description: "Optional. at_risk, overdue, or any (default: both At risk and Overdue)."
+    - key: get-commitment-evidence
+      name: Get commitment evidence
+      function: fn-commitment-evidence
+      actionVerb: GET
+      description: |
+        Returns the evidence for one accessible commitment, found by id or title: risk status, reason codes with issue keys and dates, linked Jira issues, source link and the user-attested recorded excerpt. Read-only.
+      inputs:
+        commitment:
+          title: Commitment
+          type: string
+          required: true
+          description: "The commitment id or title the user is asking about."
+    - key: preview-issue-impact
+      name: Preview issue impact
+      function: fn-issue-impact
+      actionVerb: GET
+      description: |
+        For a Jira issue key or URL, returns the accessible commitments that explicitly link the issue, their risk status and reasons, and any permitted Teamwork Graph context, labelled separately. Read-only.
+      inputs:
+        issue:
+          title: Jira issue
+          type: string
+          required: true
+          description: "A Jira issue key (for example PROJ-12) or an issue URL on this site."
+
+  rovo:skill:
+    # F07: the task-specific skill; procedure in skills/rippleguard-impact/SKILL.md.
+    - key: rippleguard-impact
+      source:
+        dir: skills/rippleguard-impact
+      dependencies:
+        tools:
+          - list-at-risk-commitments
+          - get-commitment-evidence
+          - preview-issue-impact
+
+  rovo:agent:
+    # F07: exactly one agent; permanent behaviour in prompts/rovo-agent.txt.
+    - key: rippleguard-impact-agent
+      name: RippleGuard Impact Agent
+      description: Read-only answers about customer delivery commitments in Jira, which are at risk, why, and what an issue change could affect.
+      prompt: resource:agent-prompt;rovo-agent.txt
+      conversationStarters:
+        - Which of my accessible commitments are at risk?
+        - Why is this commitment marked at risk or overdue?
+        - What linked work and graph context might be affected by this issue?
+      actions:
+        - list-at-risk-commitments
+        - get-commitment-evidence
+        - preview-issue-impact
+      skills:
+        - rippleguard-impact
+
+  rovo:mcp:
+    # F08: exposes ONLY the same three read-only actions. External MCP clients
+    # additionally need an admin to enable access in Atlassian Administration.
+    - key: rippleguard-mcp
+      name: RippleGuard MCP
+      tools:
+        - list-at-risk-commitments
+        - get-commitment-evidence
+        - preview-issue-impact
+
   function:
     - key: resolver
       handler: index.handler
+    - key: issue-updated
+      handler: index.handleIssueUpdated
+    - key: fn-list-at-risk
+      handler: index.listAtRiskCommitments
+    - key: fn-commitment-evidence
+      handler: index.getCommitmentEvidence
+    - key: fn-issue-impact
+      handler: index.previewIssueImpact
 
 resources:
   - key: ui
     path: static/rippleguard-ui/build
     tunnel:
       port: 5173 # must match server.port in static/rippleguard-ui/vite.config.ts
+  - key: agent-prompt
+    path: prompts
 
 permissions:
   scopes:
-    - storage:app # F02: Forge KVS commitment records
-    - read:jira-work # F02/F03: read and validate linked Jira issues
+    - storage:app # F02: Forge KVS records
+    - read:jira-work # F02/F03/F04/F07: read linked Jira issues; issue-updated event
+    - write:jira-work # F06: create the one user-confirmed mitigation Task (as the user)
+    - read:graph:page:confluence # F05: optional Teamwork Graph source-page context (Preview)
   content:
     styles:
-      # Radix/shadcn primitives and the shadcn chart component inject <style> elements.
+      # Radix/shadcn primitives inject <style> elements.
       - unsafe-inline
 
 app:
