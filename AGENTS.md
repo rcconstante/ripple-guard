@@ -10,6 +10,8 @@
 
 ### Reading order (do not skip)
 
+The files under `docs/` are maintained locally by the project owner. Obtain them before changing product behavior in a fresh clone.
+
 1. `docs/FEATURE_SCOPE.md` — exhaustive product contract.
 2. `SCOPE_LOCK.json` — cross-check the ID list.
 3. `docs/ARCHITECTURE.md` — permitted technical approaches and module boundaries.

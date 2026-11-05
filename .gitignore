@@ -27,3 +27,7 @@ Thumbs.db
 
 # Demo recorder (Playwright + FFmpeg): session, recordings and generated media
 test-videos/
+
+# Local project notes and assistant configuration
+/docs/
+/CLAUDE.md
