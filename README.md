@@ -13,9 +13,9 @@
 
 ## Watch the demo
 
-[![RippleGuard video thumbnail showing a Jira delay putting a promise at risk](docs/media/rippleguard-thumbnail.jpg)](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/docs/media/rippleguard-demo.mp4)
+[![RippleGuard video thumbnail showing a Jira delay putting a promise at risk](docs/media/rippleguard-thumbnail.jpg)](https://youtu.be/0NEaJ8ICcg0)
 
-[Watch or download the final demo MP4](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/docs/media/rippleguard-demo.mp4) (4:21, with narration and captions).
+[Watch on YouTube](https://youtu.be/0NEaJ8ICcg0) (4:21, with narration and captions) · [Download the MP4](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/docs/media/rippleguard-demo.mp4)
 
 The demo follows a fictional customer promise from Confluence through a Jira due date change, the Impact Explorer, a confirmed mitigation Task, and read-only Rovo and MCP queries. The risk and its evidence appear around 1:41, Rovo around 3:07, and MCP around 3:39.
 

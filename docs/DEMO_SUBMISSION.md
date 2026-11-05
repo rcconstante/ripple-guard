@@ -8,7 +8,7 @@ For judging, use the production Forge installation link supplied by the maintain
 
 For maintainers, first run `npm ci` and `npm run check`, then deploy with `forge deploy --environment production`. In the Forge Developer Console, open **Distribution**, enable sharing for Jira, and copy the installation link. Verify it with an independent Jira site administrator before submitting it. [Forge distribution guide](https://developer.atlassian.com/platform/forge/distribute-your-apps/#start-sharing-your-app)
 
-Codegeist requires a judge installation link and a public YouTube video under five minutes. The [README video](../README.md#watch-the-demo) links directly to the finished MP4. Add the public YouTube URL and installation link to Devpost when available. [Codegeist rules](https://codegeist2026.devpost.com/rules)
+Codegeist requires a judge installation link and a public YouTube video under five minutes. Use the [RippleGuard demo video](https://youtu.be/0NEaJ8ICcg0) on Devpost and include the production installation link once it is verified. [Codegeist rules](https://codegeist2026.devpost.com/rules)
 
 ## Teamwork Graph
 
