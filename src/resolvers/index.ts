@@ -252,7 +252,7 @@ export const resolvers: Handlers<RippleGuardApi> = {
           risk: summary.risk,
         },
         linkedIssues: summary.issues,
-        graphContext: await graphContextFor(item.commitment, siteBaseUrl, caller.cloudId),
+        graphContext: await graphContextFor(item.commitment, item.facts, siteBaseUrl, caller.cloudId),
       });
     }),
 

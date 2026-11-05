@@ -1,44 +1,41 @@
-# Demo and Submission — RippleGuard v1.0 (draft)
+# Judge and release guide
 
-Status: **draft**. Record final footage only after the full rehearsal in `docs/IMPLEMENTATION_PLAN.md` passes on a real Jira site. Verify the Devpost deadline before submitting.
+Use the [README walkthrough](../README.md#judge-walkthrough) to reproduce the demo with fictional data on a Jira Cloud site. A Jira administrator installs the app, and the reviewer needs Browse access to all Jira issues linked to the demo commitment. Use a project with a standard **Task** issue type. The reviewer also needs **Create Issues** permission to confirm a mitigation.
 
-## 1. Production deployment
+## Installation
 
-```bash
-npm install
-npm run check                       # typecheck, lint (incl. forge lint), tests, build
-forge deploy -e production
-forge install -e production --product jira --site <judge-or-test-site>.atlassian.net
-```
+For judging, use the production Forge installation link supplied by the maintainer. The recording uses a development installation on a separate demo site.
 
-Share the production installation link from the Developer Console (Distribution) so a separate admin can install it (REL-T02).
+For maintainers, first run `npm ci` and `npm run check`, then deploy with `forge deploy --environment production`. In the Forge Developer Console, open **Distribution**, enable sharing for Jira, and copy the installation link. Verify it with an independent Jira site administrator before submitting it. [Forge distribution guide](https://developer.atlassian.com/platform/forge/distribute-your-apps/#start-sharing-your-app)
 
-## 2. Admin steps after install
+Codegeist requires a judge installation link and a public YouTube video under five minutes. The [README video](../README.md#watch-the-demo) links directly to the finished MP4. Add the public YouTube URL and installation link to Devpost when available. [Codegeist rules](https://codegeist2026.devpost.com/rules)
 
-1. Approve the app's permissions, including Forge LLM (used only for explanation wording).
-2. Teamwork Graph scopes require an organization admin. If Graph context isn't available, the Impact Explorer shows "Additional Teamwork Graph context unavailable" (expected fallback).
-3. Optional, for external MCP clients: Atlassian Administration → Apps → Sites → your site → Connected apps → enable external access for RippleGuard. Rovo Studio access needs no extra step.
+## Teamwork Graph
 
-## 3. Judge test setup
+For a visible suggestion, link two test Jira tasks using a supported Jira work-item relationship and link one of those tasks to the commitment. Allow time for the relationship to appear in Teamwork Graph. Open **View impact** and look for **Graph-suggested context**. The explicit issue links remain available if the Graph query has no results or the site lacks access.
 
-1. In a Jira project that has the **Task** issue type, create two issues with due dates before 30 days from today, for example `DEMO-1` (due in 10 days) and `DEMO-2` (due in 20 days).
-2. Have a Confluence page (or any page on the same site) that records the customer promise; copy its URL.
-3. Open **Apps → RippleGuard** in Jira.
+## Rovo Chat
 
-## 4. Demo script (target about 3 minutes, under 5)
+On a Rovo-enabled Jira site, select **Ask Rovo → Agent selector → Browse agents → RippleGuard Impact Agent**. Try these prompts after changing a linked issue's due date beyond the promised date.
 
-1. **Record commitment** (Commitments → New commitment): title, customer label, promised date 25 days out, the source URL, a short excerpt, link `DEMO-1` and `DEMO-2`. Save → status **On track**.
-2. **Move a Jira due date**: open `DEMO-2` in Jira and set its due date after the promised date. Wait for the event (up to ~3 minutes) or reopen the commitment.
-3. **Show risk and evidence**: Dashboard shows **At risk**; Commitment Detail shows reason `ISSUE_DUE_AFTER_PROMISE`, the issue key and dates, the recorded excerpt, and the explanation. The issue panel on `DEMO-2` lists the commitment.
-4. **Inspect the graph**: View impact → commitment and issues joined by "Linked by user", plus Graph-suggested context or the fallback message.
-5. **Confirm one mitigation**: Create mitigation Jira issue → review the draft → Confirm create issue → link to the new Task. Click again: the existing issue is shown, not a duplicate.
-6. **Read-only Rovo**: ask the RippleGuard Impact Agent "Which of my accessible commitments are at risk?" and "Why is <title> marked at risk?". Then ask it to change a due date: it refuses.
+- “Which of my accessible commitments are at risk?”
+- “Why is the demo commitment at risk? Cite the Jira issue, promise date, and due date.”
+- “What confirmed work and Graph context might be affected by DEMO-1?” Replace the example with your issue key.
+- “Change the due date on DEMO-1.” The agent should decline and the Jira due date should stay the same.
 
-## 5. Devpost description outline
+## External MCP
 
-- Category: Apps for Business Teams.
-- Problem: delivery promises live in documents while delivery dates move in Jira.
-- What it does: F01–F08 in one paragraph each, using the exact status vocabulary.
-- How it's built: Forge (Custom UI, resolvers, KVS, one Jira trigger), deterministic risk engine, Forge LLM for wording only, Teamwork Graph (optional, read-only), one Rovo agent + skill, `rovo:mcp` with three read-only tools.
-- Trust and safety: every read re-checks Jira permissions as the user; AI never decides status; one user-confirmed Jira write.
-- Limitations: state any Preview features that were not verified on the judge-installable app. Don't claim bonus features without proof.
+1. In **Atlassian Administration → Apps → Sites → your site → Connected apps**, open RippleGuard and enable its tools for MCP-compatible clients.
+2. Add `https://mcp.atlassian.com/forge/ad4d4803-cf2d-444f-a50a-7fa8fba7c4fa` to an MCP client that supports remote OAuth. For an independently registered copy, substitute the UUID from that app's manifest.
+3. Select the site in Atlassian's consent screen and approve the connection as the Jira user running the check.
+4. List the tools and call the at-risk list, then query evidence by commitment title. Tool names may include the Forge environment suffix.
+
+| Tool | Expected result |
+| --- | --- |
+| `list-at-risk-commitments` | Accessible commitments currently At risk or Overdue |
+| `get-commitment-evidence` | The commitment, linked Jira issues, dates, reasons, and sources |
+| `preview-issue-impact` | Accessible commitments linked to a Jira issue and optional Graph context |
+
+## Verification
+
+The recorded Forge development walkthrough covers the Jira risk and mitigation flow, Teamwork Graph suggestions, a Rovo refusal to change a date, and external MCP tool listing and reads. Restricted-user acceptance and a production install by an independent admin remain to be verified. Use the [manual acceptance checklist](TEST_MATRIX.md) for those checks.

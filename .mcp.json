@@ -3,6 +3,10 @@
     "forge-docs": {
       "type": "http",
       "url": "https://mcp.atlassian.com/v1/forge/mcp"
+    },
+    "rippleguard": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/forge/ad4d4803-cf2d-444f-a50a-7fa8fba7c4fa"
     }
   }
 }

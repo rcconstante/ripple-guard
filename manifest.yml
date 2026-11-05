@@ -14,6 +14,7 @@ modules:
       resolver:
         function: resolver
       title: RippleGuard
+      icon: resource:ui;rippleguard-mark.png # brand mark in the Jira Apps menu and sidebar
 
   jira:issuePanel:
     # F03: linked commitment summaries for the open Jira issue (read-only).
@@ -22,7 +23,7 @@ modules:
       resolver:
         function: resolver
       title: RippleGuard
-      icon: resource:ui;panel-icon.svg # required by jira:issuePanel
+      icon: resource:ui;rippleguard-mark.png # required by jira:issuePanel
 
   trigger:
     # F03: the single event subscription. Re-evaluates risk; never mutates Jira.
@@ -93,6 +94,7 @@ modules:
     # F07: exactly one agent; permanent behaviour in prompts/rovo-agent.txt.
     - key: rippleguard-impact-agent
       name: RippleGuard Impact Agent
+      icon: resource:ui;rippleguard-mark.png
       description: Read-only answers about customer delivery commitments in Jira, which are at risk, why, and what an issue change could affect.
       prompt: resource:agent-prompt;rovo-agent.txt
       conversationStarters:
@@ -141,7 +143,7 @@ permissions:
     - storage:app # F02: Forge KVS records
     - read:jira-work # F02/F03/F04/F07: read linked Jira issues; issue-updated event
     - write:jira-work # F06: create the one user-confirmed mitigation Task (as the user)
-    - read:graph:page:confluence # F05: optional Teamwork Graph source-page context (Preview)
+    - read:graph:issue:jira # F05: optional Teamwork Graph related work items (Preview, read-only, as the user)
   content:
     styles:
       # Radix/shadcn primitives inject <style> elements.

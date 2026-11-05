@@ -24,3 +24,6 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 *.sw?
+
+# Demo recorder (Playwright + FFmpeg): session, recordings and generated media
+test-videos/

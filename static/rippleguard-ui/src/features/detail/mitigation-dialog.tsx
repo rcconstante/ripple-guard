@@ -170,7 +170,7 @@ function DraftForm({ draft, acknowledgePendingReview, onCancel, onSubmittingChan
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-lg bg-muted/50 p-3 text-sm">
           <dt className="text-muted-foreground">Target project</dt>
           <dd className="font-medium">{draft.projectKey}</dd>
@@ -208,7 +208,8 @@ function DraftForm({ draft, acknowledgePendingReview, onCancel, onSubmittingChan
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={12}
-            className="font-mono text-xs"
+            // Fixed size: auto-sizing to a long URL line would widen the dialog past the screen.
+            className="field-sizing-fixed font-mono text-xs wrap-anywhere"
             aria-invalid={descriptionInvalid}
             aria-describedby={`${id}-description-help`}
             disabled={submitting}

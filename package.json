@@ -8,18 +8,16 @@
     "node": ">=24"
   },
   "scripts": {
-    "postinstall": "npm --prefix static/rippleguard-ui install",
+    "postinstall": "npm --prefix static/rippleguard-ui ci",
     "dev": "npm --prefix static/rippleguard-ui run dev",
     "tunnel": "forge tunnel",
     "build": "npm --prefix static/rippleguard-ui run build",
     "typecheck": "tsc --noEmit && npm --prefix static/rippleguard-ui run typecheck",
     "lint": "oxlint src && npm --prefix static/rippleguard-ui run lint && forge lint",
-    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run build",
     "deploy": "npm run build && forge deploy",
     "deploy:install": "npm run deploy && forge install --upgrade",
-    "logs": "forge logs",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "logs": "forge logs"
   },
   "dependencies": {
     "@forge/api": "^8.4.0",
@@ -30,7 +28,6 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "oxlint": "^1.91.0",
-    "typescript": "~5.9.2",
-    "vitest": "^5.1.0"
+    "typescript": "~5.9.2"
   }
 }

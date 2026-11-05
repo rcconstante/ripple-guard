@@ -1,6 +1,6 @@
 # Implementation Plan — RippleGuard v1.0
 
-Sequence from README §9. Do not build later phases early. "Code complete" means implemented with unit tests passing; "Accepted" means the matching `docs/TEST_MATRIX.md` tests passed on a real Jira Cloud site.
+This plan records implementation milestones and the manual acceptance steps in [TEST_MATRIX.md](TEST_MATRIX.md). Code verification uses `npm run check`; live acceptance requires a Jira Cloud site.
 
 | Phase | Features | Code | Accepted on real Jira |
 |---|---|---|---|
@@ -8,9 +8,9 @@ Sequence from README §9. Do not build later phases early. "Code complete" means
 | 2. Commitment register | F02 | Complete | Pending |
 | 3. Issue linkage | F03 (global page, issue panel, `avi:jira:updated:issue`) | Complete | Pending |
 | 4. Risk engine | F04 | Complete (truth table unit-tested) | Pending |
-| 5. Dashboard and graph | F01, F05 | Complete | Pending (Teamwork Graph likely blocked, see below) |
+| 5. Dashboard and graph | F01, F05 | Complete | Demo flow passed on one-atlas-ayel and rippleguard-dev (Teamwork Graph suggestion shown; see limitation below) |
 | 6. Mitigation | F06 | Complete (service tests for duplicates/retries) | Pending |
-| 7. Rovo and MCP | F07, F08 | Complete (Preview modules deploy) | Pending |
+| 7. Rovo and MCP | F07, F08 | Complete (Preview modules deploy) | F07 passed on one-atlas-ayel (at-risk list, reason, refused a due-date change; Jira unchanged). F08-T01/T02 passed on one-atlas-ayel (admin-enabled external access; an OAuth client approved by the user lists exactly three read-only tools; list and evidence calls return that user's commitment). F08-T03 (restricted user) pending |
 | 8. Security, E2E, deployment | SEC, REL, SCOPE tests | Partly (validation, access, logging rules in code) | Pending |
 
 ## Where things live
@@ -40,6 +40,6 @@ Prepare: a Jira project with the standard **Task** issue type, 3–4 issues with
 
 ## Known platform limitations (record results, don't substitute features)
 
-- **Teamwork Graph (F05):** new apps can't send raw Cypher. No curated query starts from a Jira work item, so enrichment uses `confluencePageLinkedConfluencePages` from the commitment's Confluence source page. The Forge CLI says `read:graph:page:confluence` needs a Confluence installation, which v1 deliberately avoids, so the fallback message may be the result.
-- **Rovo skill and rovo:mcp** are Preview. External MCP access needs an admin to enable it in Atlassian Administration.
+- **Teamwork Graph (F05):** new apps can't send raw Cypher. Enrichment uses the curated field `jiraWorkItemHierarchy` (listed in the site's live Teamwork Graph schema), starting from each linked issue, with the Jira-only scope `read:graph:issue:jira`. Suggestions are re-read from Jira as the user before display. The relationship *kind* isn't shown: on the dev site, the `kinds` filter reported a Jira "Blocks" link in the opposite direction, so the UI only says the issues are related. Graph indexing of a new issue link can lag (2–12 s observed); the demo recorder waits for it before filming. On one-atlas-ayel, Teamwork Graph intermittently answers "User is not permitted to query this organization" (also reported on the developer community for demo-type sites); the service retries that error, and the recorder reloads off-camera and logs the count.
+- **Rovo skill and rovo:mcp** are Preview. External MCP access needs an admin to enable it in Atlassian Administration. The MCP endpoint is `https://mcp.atlassian.com/forge/<appId>` (OAuth 2.1 with dynamic client registration); on the consent screen the user must choose a site before Accept is enabled. Tool names carry the environment suffix (for example `list-at-risk-commitments_development`).
 - **Forge LLM** needs admin approval at install/upgrade; without it, explanations use rule-based wording (F04-T13).

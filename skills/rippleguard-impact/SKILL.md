@@ -28,7 +28,7 @@ Use this skill only for these three question types. All three tools are read-onl
 1. Call `preview-issue-impact` with `issue` = the issue key or URL.
 2. If there is an `error`, repeat it plainly (for example, the issue doesn't exist or the user can't view it).
 3. For each returned commitment: title, promised date, status, reasons, and the other linked issues.
-4. Present `graphSuggestedContext` separately under "Graph-suggested context" as possibly related pages. If it contains a `message`, repeat it. Never present graph items as confirmed links or as proof of a commitment.
+4. Present `graphSuggestedContext` separately under "Graph-suggested context" as possibly related Jira work (each item says which linked issue it relates to). If it contains a `message`, repeat it. Never present graph items as confirmed links or as proof of a commitment.
 
 ## Rules for every answer
 

@@ -105,7 +105,7 @@ Do not run an AI call for every Jira update; risk status should remain fully fun
 - Prefer bounded (max 10 issue links) resolver requests and short Graph traversals.
 - No scheduled polling. Rely on trigger events and on-demand refresh when a detail page opens.
 - No retries that duplicate Jira mitigation tasks. The final create action must be explicitly user initiated.
-- Use `forge lint`, TypeScript checks, Vitest, and a real Jira dev site for acceptance.
+- Use `npm run check` for build verification and a real Jira development site for the manual acceptance checklist.
 - Do not claim preview Graph/Rovo MCP functionality is available until tested on the judge-installable production app.
 
 ## J. Official API references

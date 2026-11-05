@@ -70,7 +70,7 @@ function ExplorerView({ view }: { view: ImpactGraphView }) {
           nodeTypes={nodeTypes}
           colorMode={dark ? 'dark' : 'light'}
           fitView
-          fitViewOptions={{ padding: 0.2 }}
+          fitViewOptions={{ padding: 0.12 }}
           minZoom={0.3}
           maxZoom={1.75}
           nodesConnectable={false}
@@ -104,7 +104,7 @@ function Legend() {
           <line x1="0" y1="4" x2="36" y2="4" stroke="currentColor" strokeWidth="1.5" strokeDasharray="6 5" />
         </svg>
         <span>
-          <strong className="font-medium">{EVIDENCE_LABELS.graphSuggested}</strong>: related content from Teamwork
+          <strong className="font-medium">{EVIDENCE_LABELS.graphSuggested}</strong>: related Jira work from Teamwork
           Graph; never used for risk and not proof of a commitment
         </span>
       </li>
@@ -166,11 +166,13 @@ function GraphTextList({ view, graphAvailable }: { view: ImpactGraphView; graphA
           {graphAvailable ? (
             <ul className="flex flex-col gap-1">
               {view.graphContext.nodes.map((node) => (
-                <li key={node.id}>
-                  <ExternalLink href={node.url} showIcon>
-                    {node.title}
-                  </ExternalLink>{' '}
-                  <span className="text-muted-foreground">(Confluence page)</span>
+                <li key={node.id} className="flex flex-wrap items-center gap-x-3">
+                  <ExternalLink href={node.url}>{node.issueKey}</ExternalLink>
+                  <span>{node.title}</span>
+                  <span className="text-muted-foreground">
+                    {node.statusName ?? 'No status'} · Due <DateText value={node.dueDate} /> · related to{' '}
+                    {node.relatedToKey}
+                  </span>
                 </li>
               ))}
             </ul>

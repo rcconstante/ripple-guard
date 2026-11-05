@@ -1,5 +1,4 @@
 import { lazy, Suspense } from 'react'
-import { ShieldCheckIcon } from 'lucide-react'
 import { LoadingState } from '@/components/states'
 import { CommitmentsPage } from '@/features/commitments/commitments-page'
 import { EditCommitmentPage, NewCommitmentPage } from '@/features/commitments/commitment-form-page'
@@ -32,7 +31,7 @@ export function GlobalApp() {
       <header className="border-b">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
           <span className="inline-flex items-center gap-2 font-heading text-base font-semibold">
-            <ShieldCheckIcon aria-hidden="true" className="size-5 text-primary" />
+            <img src={`${import.meta.env.BASE_URL}rippleguard-mark.png`} alt="" aria-hidden="true" className="size-6" />
             RippleGuard
           </span>
           <nav aria-label="RippleGuard">

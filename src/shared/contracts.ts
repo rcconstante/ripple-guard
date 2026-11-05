@@ -154,12 +154,25 @@ export interface IssueCommitmentsView {
   commitments: IssueCommitmentItem[];
 }
 
+/**
+ * A Teamwork Graph suggestion: a Jira work item related (parent, child or issue
+ * link) to one of the commitment's linked issues. Display-only: never a
+ * commitment link, never an input to risk. Data is Jira's current view as the user.
+ */
 export interface GraphContextNode {
   /** Stable node id for rendering. */
   id: string;
-  type: 'confluence_page';
+  type: 'jira_issue';
+  issueId: string;
+  issueKey: string;
   title: string;
   url: string;
+  statusName: string | null;
+  dueDate: string | null;
+  projectKey: string | null;
+  /** The linked issue this suggestion is related to. */
+  relatedToIssueId: string;
+  relatedToKey: string;
 }
 
 export interface GraphContext {

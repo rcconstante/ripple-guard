@@ -163,12 +163,20 @@ export async function previewIssueImpact(payload: unknown, context: unknown) {
       linkedCommitmentCount: items.length,
       commitments: await Promise.all(
         items.map(async (item) => {
-          const graph = await graphContextFor(item.commitment, site, caller.cloudId);
+          const graph = await graphContextFor(item.commitment, item.facts, site, caller.cloudId);
           return {
             ...commitmentFacts(item, caller, site),
             graphSuggestedContext:
               graph.status === 'available'
-                ? graph.nodes.map((n) => ({ relationship: EVIDENCE_LABELS.graphSuggested, title: n.title, url: n.url }))
+                ? graph.nodes.map((n) => ({
+                    relationship: EVIDENCE_LABELS.graphSuggested,
+                    relatedTo: n.relatedToKey,
+                    key: n.issueKey,
+                    summary: n.title,
+                    status: n.statusName,
+                    dueDate: n.dueDate,
+                    url: n.url,
+                  }))
                 : { message: graph.message },
           };
         }),

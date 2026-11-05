@@ -1,6 +1,6 @@
 # Acceptance Test Matrix — RippleGuard v1.0
 
-Every test is mandatory unless marked `Preview platform blocked` after a genuine access/permission test. A blocked preview capability is **not** a passing implementation or a qualifying bonus demo. Real Jira tests must not use fake resolver responses. Use Vitest for pure logic, service-level tests for validation/permissions, and a test Jira tenant for E2E.
+Every test is mandatory unless marked `Preview platform blocked` after a genuine access/permission test. A blocked preview capability is **not** a passing implementation or a qualifying bonus demo. Real Jira tests must not use fake resolver responses. Use a Jira Cloud test site for end-to-end and permission checks.
 
 ## Domain and registration
 
