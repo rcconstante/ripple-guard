@@ -49,7 +49,7 @@ Use a Jira Cloud site and a Jira project with the **Task** issue type. A Jira ad
 3. Choose the test site on Atlassian's consent screen. Use the Jira account whose access you want to test.
 4. List the tools and try `list-at-risk-commitments`, `get-commitment-evidence`, and `preview-issue-impact`. Names may include the Forge environment suffix.
 
-The recorded demo uses a Forge development installation. For judge installation, the maintainer deploys to Forge production, enables Jira sharing in the Developer Console, and verifies the installation link with a separate Jira admin. Independent admin installation and restricted-user verification are pending. [Forge distribution guide](https://developer.atlassian.com/platform/forge/distribute-your-apps/#start-sharing-your-app)
+The recorded demo uses a Forge development installation. Production version 2.0.0 is deployed. For judge installation, the maintainer enables Jira sharing in the Developer Console and verifies the installation link with a separate Jira admin. Sharing-link verification, independent admin installation, and restricted-user verification are pending. [Forge distribution guide](https://developer.atlassian.com/platform/forge/distribute-your-apps/#start-sharing-your-app)
 
 ## Run from source
 
@@ -111,3 +111,5 @@ npm run dev
 ```
 
 To deploy on Vercel, import this repository and select **website** as the Root Directory, **Next.js** as the framework preset, and **Node.js 24.x**. Use the default build and output settings. The site uses the included assets and requires no environment variables. [Vercel project setup](https://vercel.com/docs/monorepos)
+
+Live site: [rippleguard-eosin.vercel.app](https://rippleguard-eosin.vercel.app/). Distribution contacts and policies: [Privacy policy](https://rippleguard-eosin.vercel.app/privacy), [Terms of service](https://rippleguard-eosin.vercel.app/terms), and [Support](https://rippleguard-eosin.vercel.app/support). These describe the evaluation release, Forge storage, AI processing, and how to request help or data deletion.

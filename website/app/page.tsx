@@ -33,7 +33,7 @@ const features = [
 function Brand() {
   return (
     <a className="brand" href="#top" aria-label="RippleGuard home">
-      <Image src="/rippleguard-logo.png" alt="" width={34} height={34} unoptimized />
+      <Image src="/rippleguard-mark.png" alt="" width={32} height={28} unoptimized />
       <span>RippleGuard</span>
     </a>
   );
@@ -103,7 +103,7 @@ export default function Home() {
             <div className="features-grid">
               {features.map(({ icon, title, copy }) => (
                 <article className="feature" key={title}>
-                  <span className={`feature-icon feature-icon-${icon}`}><Icon name={icon} /></span>
+                  <Image className="feature-icon" src={`/icons/${icon}.svg`} alt="" width={64} height={64} unoptimized />
                   <h3>{title}</h3>
                   <p>{copy}</p>
                 </article>
@@ -149,7 +149,7 @@ export default function Home() {
         <div className="shell footer-inner">
           <Brand />
           <p>Built by Richmond Constante for Atlassian Codegeist 2026.</p>
-          <nav aria-label="Footer navigation"><a href={repository}>GitHub</a><a href={youtube}>YouTube</a></nav>
+          <nav aria-label="Footer navigation"><a href={repository}>GitHub</a><a href={youtube}>YouTube</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></nav>
         </div>
       </footer>
     </>
