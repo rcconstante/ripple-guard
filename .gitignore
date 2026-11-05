@@ -31,3 +31,8 @@ test-videos/
 # Local project notes and assistant configuration
 /docs/
 /CLAUDE.md
+
+# Next.js landing page
+/website/.next/
+/website/next-env.d.ts
+/website/.vercel/

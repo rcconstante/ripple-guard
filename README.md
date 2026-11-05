@@ -13,9 +13,9 @@
 
 ## Watch the demo
 
-[![RippleGuard video thumbnail showing a Jira delay putting a promise at risk](assets/demo/rippleguard-thumbnail.jpg)](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/assets/demo/rippleguard-demo.mp4)
+[![RippleGuard video thumbnail showing a Jira delay putting a promise at risk](website/public/rippleguard-thumbnail.jpg)](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/website/public/rippleguard-demo.mp4)
 
-[Open the demo MP4](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/assets/demo/rippleguard-demo.mp4) (4:21, with narration and captions) · [Watch on YouTube](https://youtu.be/0NEaJ8ICcg0)
+[Open the demo MP4](https://raw.githubusercontent.com/rcconstante/ripple-guard/main/website/public/rippleguard-demo.mp4) (4:21, with narration and captions) · [Watch on YouTube](https://youtu.be/0NEaJ8ICcg0)
 
 The demo follows a fictional customer promise from Confluence through a Jira due date change, the Impact Explorer, a confirmed mitigation Task, and read-only Rovo and MCP queries. The risk and its evidence appear around 1:41, Rovo around 3:07, and MCP around 3:39.
 
@@ -99,3 +99,15 @@ For live development, run `npm run dev` and `npm run tunnel` in separate termina
 Jira changes trigger Forge to recalculate the risk for linked active commitments. The risk engine compares dates in UTC and applies fixed rules. Forge LLM can explain the evidence in plain language. The dashboard, issue panel, Rovo agent, and MCP tools use the same permission checks. A commitment is visible only when the caller can read every linked Jira issue.
 
 - [Codegeist submission rules](https://codegeist2026.devpost.com/rules)
+
+## Landing page
+
+The Next.js landing page in [website/](website/) includes the complete demo with a native video player.
+
+```bash
+cd website
+npm ci
+npm run dev
+```
+
+To deploy on Vercel, import this repository and select **website** as the Root Directory, **Next.js** as the framework preset, and **Node.js 24.x**. Use the default build and output settings. The site uses the included assets and requires no environment variables. [Vercel project setup](https://vercel.com/docs/monorepos)
